@@ -62,32 +62,67 @@ def PasswordGenerator():
                 print('That is invalid, please enter a valid email')
                 continue
         
-        while True: # Input and validation of 'length' of password
+        while True: # Input and validation of password storage choice
             try:
-                length = int(input("Enter the length of the password \n(Must be greater than or equal to 4 characters and less than 128, we recommend at least 9 for maximum security): "))
-                if length <= 4 or length >128:
-                    lengthError = ValueError('It cannot be less than 4 characters')
-                    raise lengthError
+                choice = int(input("Enter what you would like to do:\n"
+                            '1: Generate a password\n'
+                            '2: Enter your own password\n'))
+                if choice < 0:
+                    negativeError = ValueError('This value is negative')
+                    raise negativeError
+                elif choice != 1 and choice != 2:
+                    invalidValueError = ValueError('Not a valid option')
+                    raise invalidValueError 
                 break
-            except ValueError or TypeError or lengthError:
-                print('That is invalid')
-
-        print('Generating...')
-        time.sleep(0.2)
-
-        while True: # Generating Password with all requirements
-            random.shuffle(chars)
-            password = []
-            for i in range(length):
-                password.append(random.choice(chars))
-            random.shuffle(password)
-            password = "".join(password)
-            if True: # Condition for accepting password
-                condition = any(charslower in password for charslower in charslower) and any(charsupper in password for charsupper in charsupper) and any(charsdigits in password for charsdigits in charsdigits) and any(charssymbols in password for charssymbols in charssymbols)
-            if condition == False:
+            except ValueError or TypeError:
+                print('That is invalid, please enter a valid number which corresponds to the options above')
                 continue
-            else:
+
+        if choice ==1: # Password Generation
+            while True: # Input and validation of 'length' of password
+                try:
+                    length = int(input("Enter the length of the password \n(Must be greater than or equal to 4 characters and less than 128, we recommend at least 9 for maximum security): "))
+                    if length <= 4 or length >128:
+                        lengthError = ValueError('It cannot be less than 4 characters')
+                        raise lengthError
+                    break
+                except ValueError or TypeError or lengthError:
+                    print('That is invalid')
+
+            print('Generating...')
+            time.sleep(0.2)
+
+            while True: # Generating Password with all requirements
+                random.shuffle(chars)
+                password = []
+                for i in range(length):
+                    password.append(random.choice(chars))
+                random.shuffle(password)
+                password = "".join(password)
+                if True: # Condition for accepting password
+                    condition = any(charslower in password for charslower in charslower) and any(charsupper in password for charsupper in charsupper) and any(charsdigits in password for charsdigits in charsdigits) and any(charssymbols in password for charssymbols in charssymbols)
+                if condition == False:
+                    continue
+                else:
+                    break
+        
+        while choice == 2: # Password Entering            
+            password = str(input('Please enter your password: '))
+            from checkStrength import checkStrength
+            checkStrength(password)
+            while True: # Input and validation of continue check
+                try:
+                    continueCheck = ((str(input('Do you want to continue? (Y/N)')))).upper()
+                    if continueCheck != 'Y' and continueCheck != 'N':
+                        raise ValueError
+                    break
+                except TypeError or ValueError:
+                    print("That is invalid, please enter 'Y' or 'N'")
+                    continue
+            if continueCheck == 'Y':
                 break
+            else:
+                continue
 
         print('The password is', password) # Printing password to user
         pyperclip.copy(password) #Copying password to clipboard

@@ -1,5 +1,55 @@
-def passwordStorage():
+from doctest import master
+from venv import create
+from checkStrength import checkStrength
 
+
+def passwordStorage():
+    from securityQuestion import securityQuestion
+    def createMP():
+        while True:
+            while True: # Input and validation of master password
+                try:
+                    masterpassword = str(getpass('Enter new master password, you will not be able to view it while typing.\n(It is recommended that this be a strong password which you would remember): '))
+                    if len(masterpassword) <=0:
+                        negativevalueError = ValueError("Can't be less than 0")
+                        raise negativevalueError
+                    break
+            
+                except ValueError or TypeError or negativevalueError:
+                    print('That is invalid, please try again')
+                    continue
+            checkStrength(masterpassword)
+            while True: # Input and validation of continue check
+                try:
+                    continueCheck = ((str(input('Do you want to continue? (Y/N)')))).upper()
+                    if continueCheck != 'Y' and continueCheck != 'N':
+                        print("That is invalid, please enter 'Y' or 'N'")
+                        continue
+                    break
+                except TypeError or ValueError:
+                    print("That is invalid, please enter 'Y' or 'N'")
+                    continue
+            if continueCheck == 'N':
+                continue
+            elif continueCheck == 'Y':
+                while True: # Input and validation of  confirmation of master password
+                    try:
+                        masterpasswordcheck = str(getpass('Confirm master password (you will not be able to view it while typing): '))
+                        if len(masterpassword) <=0:
+                            negativevalueError = ValueError("Can't be less than 0")
+                            raise negativevalueError
+                        break
+                    except ValueError or TypeError or negativevalueError:
+                        print('That is invalid, please try again')
+                        continue
+            if True: # Checking if user entered same password both times
+                if masterpassword != masterpasswordcheck: 
+                    print("They don't match, try again")
+                    continue
+                else:
+                    break
+        return masterpassword
+    
     from getpass import getpass # Module and its function to hide input while typing. Used on 23, 24 and 37
     print ('\nWelcome to password storage!')
     while True: # Input and validation of action
@@ -20,55 +70,83 @@ def passwordStorage():
     
     else:
         validatingAuthenticity = False # Bool to check that user knows master password
-        with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'a+') as MPCheck: # Master password creation/validation
-            with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'r+') as MPCheck: # Opens same file for reading
-                firstline = MPCheck.read() #Extracts first line from file 
+        with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'r') as MPCheck: # Opens same file for reading
+                firstline = MPCheck.read() #Extracts first line from file
                 if len(firstline) == 0:    # If master password doesn't exist yet
-                    while True:
-                        while True: # Input and validation of master password
-                            try:
-                                masterpassword = str(getpass('Enter master password for first time, you will not be able to view it while typing.\n(It is recommended that this be a strong password which you would remember): '))
-                                if len(masterpassword) <=0:
-                                    negativevalueError = ValueError("Can't be less than 0")
-                                    raise negativevalueError
-                                break
-                            except ValueError or TypeError or negativevalueError:
-                                print('That is invalid, please try again')
-                                continue
-                        while True: # Input and validation of  confirmation of master password
-                            try:
-                                masterpasswordcheck = str(getpass('Confirm master password (you will not be able to view it while typing): '))
-                                if len(masterpassword) <=0:
-                                    negativevalueError = ValueError("Can't be less than 0")
-                                    raise negativevalueError
-                                break
-                            except ValueError or TypeError or negativevalueError:
-                                print('That is invalid, please try again')
-                                continue
-                        if True: # Checking if user entered same password both times
-                            if masterpassword != masterpasswordcheck: 
-                                print("They don't match, try again")
-                                continue
-                            else:
-                                MPCheck.write(masterpassword)
-                                firstline = masterpassword
-                                validatingAuthenticity = True
-                                break
-                    # Gets here when master password has been created 
+                        firstline = createMP()
+                        with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'w') as MPCheck:
+                            MPCheck.write(firstline)
+                        validatingAuthenticity = True
+                        global security
+                        security = securityQuestion()
+                        with open('securityquestion.txt', 'a+') as securityFile:
+                            securityFile.write(security[0] + '\n')
+                            securityFile.write(security[1])
+                # Gets here when master password has been created 
                 else: # If master password exists, prompts user to enter it until they get it right
                     while True:
                         validatingAuthenticity = False
-                        masterpasswordcheck = str(getpass('Enter your master password to continue: '))
-                        if masterpasswordcheck != firstline:
+                        masterpasswordcheck = str(getpass("Enter your master password to continue (Or input 'F' to reset it): "))
+                        if masterpasswordcheck == 'F':
+                            while True: # Input and validation of continue check
+                                try:
+                                    rememberCheck = str(input('Do you remember the old password? (Y/N) ')).upper()
+                                    if rememberCheck == 'Y' or rememberCheck == 'N':
+                                        break
+                                    else:
+                                        continue
+                                except TypeError or ValueError:
+                                    print("That is invalid, please enter 'Y' or 'N'")
+                                    continue
+                            if rememberCheck == 'Y':
+                                while True:
+                                    masterpasswordcheck = str(getpass('Enter your old password: (You will not be able to view it while typing '))
+                                    if masterpasswordcheck != firstline:
+                                        print('That is wrong, try again')
+                                        continue
+                                    else:
+                                        break
+                                with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'r+') as MPCheck:
+                                    MPCheck.truncate(0)
+                                with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'w') as MPCheck:
+                                    firstline = createMP()
+                                    MPCheck.write(firstline)
+                                security = securityQuestion()
+                            else:
+                                with open('securityquestion.txt', 'r') as SecurityFile:
+                                    securitylines = []
+                                    for line in SecurityFile:
+                                        securitylines.append(line.strip())
+                                print('Your secuirty question is: ', securitylines[0])
+                                while True:
+                                    answer = str(input('Please enter the answer to your security question: '))
+                                    if answer != securitylines[1]:
+                                        print('That answer is incorrect, please try again:')
+                                        continue
+                                    else:
+                                        break
+                                with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'r+') as MPCheck:
+                                    MPCheck.truncate(0)
+                                with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'w') as MPCheck:
+                                    firstline = createMP()
+                                    MPCheck.write(firstline)
+                                with open('securityquestion.txt', 'r+') as securityFile:
+                                    securityFile.truncate(0)
+                                    security = securityQuestion()
+                                    securityFile.write(security[0] + '\n')
+                                    securityFile.write(security[1])
+                                
+                        elif masterpasswordcheck != firstline:
                             print('That is invalid, please try again.')
                             continue
                         else:
                             validatingAuthenticity = True
                             break
         if validatingAuthenticity == True: # Allows user to access passwords generated from passwordGeneration.py
-            import os.path
-            passwordsexist = os.path.exists('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt') # Checks if user has generated at least one password 
-            if passwordsexist == True: # Shows the user the passwords and terminates     
+            import os
+            fileExist = os.path.exists('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt') # Checks if user has generated at least one password 
+            entryExist = os.stat('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt').st_size
+            if fileExist == True and entryExist > 0: # Shows the user the passwords and terminates     
                
                 with open ('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt', 'r') as myfile: #Extracting number of lines
                     mylines = []

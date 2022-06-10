@@ -87,9 +87,10 @@ def removeEntry():
                                         validatingAuthenticity = True
                                         break
                     if validatingAuthenticity == True: # Allows user to access passwords generated from passwordGeneration.py
-                        import os.path
-                        passwordsexist = os.path.exists('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt') # Checks if user has generated at least one password 
-                        if passwordsexist == True: # Prints two consecutive lines of 'file-passwords.txt' next to each other in the format "n: (site) - (storedpassword) "                            
+                        import os
+                        fileExist = os.path.exists('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt') # Checks if user has generated at least one password 
+                        entryExist = os.stat('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt').st_size
+                        if fileExist == True and entryExist > 0: # Shows the user the passwords and terminates     
                             with open ('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt', 'r') as myfile: 
                                 mylines = []
                                 noOfLines = len((myfile).readlines())
