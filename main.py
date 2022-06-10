@@ -17,7 +17,7 @@ while True:
             if action < 0:
                 negativeError = ValueError('This value is negative')
                 raise negativeError
-            elif action != 1 and action != 2 and action != 3:
+            elif action != 1 and action != 2 and action != 3 and action !=4:
                 invalidValueError = ValueError('Not a valid option')
                 raise invalidValueError 
             break
