@@ -1,11 +1,8 @@
-from doctest import master
-from venv import create
-from checkStrength import checkStrength
-
-
 def passwordStorage():
-    from securityQuestion import securityQuestion
-    def createMP():
+    from checkStrength import checkStrength # To inform user of MP Strength
+    from securityQuestion import securityQuestion # To ask for security answer when resetting password
+    
+    def createMP(): # Function to create and return master password
         while True:
             while True: # Input and validation of master password
                 try:
@@ -50,8 +47,10 @@ def passwordStorage():
                     break
         return masterpassword
     
-    from getpass import getpass # Module and its function to hide input while typing. Used on 23, 24 and 37
+    from getpass import getpass # Module to hide input of passwords while typing 
+    
     print ('\nWelcome to password storage!')
+    
     while True: # Input and validation of action
         try:
             action = int(input("Enter what you would like to do:\n"
@@ -68,10 +67,13 @@ def passwordStorage():
     if action == 2: # Return dummy value and iterate main.py again
         return ("Exit")
     
-    else:
-        validatingAuthenticity = False # Bool to check that user knows master password
-        with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'r') as MPCheck: # Opens same file for reading
-                firstline = MPCheck.read() #Extracts first line from file
+    else: # Main code block to view passwords
+        
+        validatingAuthenticity = False # Initialise of Bool to check if user knows master password
+        
+        with open('masterpasswordcheck.txt', 'r') as MPCheck: # Opens masterpassword file to check if it exists and/or create it
+                
+                firstline = MPCheck.read() #Extracts first line from masterpassword file
                 if len(firstline) == 0:    # If master password doesn't exist yet
                         firstline = createMP()
                         with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'w') as MPCheck:
@@ -82,13 +84,17 @@ def passwordStorage():
                         with open('securityquestion.txt', 'a+') as securityFile:
                             securityFile.write(security[0] + '\n')
                             securityFile.write(security[1])
+                
                 # Gets here when master password has been created 
-                else: # If master password exists, prompts user to enter it until they get it right
+                
+                else: # If master password exists, prompts user to enter it or reset it
                     while True:
                         validatingAuthenticity = False
-                        masterpasswordcheck = str(getpass("Enter your master password to continue (Or input 'F' to reset it): "))
-                        if masterpasswordcheck == 'F':
-                            while True: # Input and validation of continue check
+                        print("Enter your master password to continue (Or input 'F' to reset it): ")
+                        masterpasswordcheck = str(getpass())
+                        if masterpasswordcheck == 'F': # Reseting code block
+                            
+                            while True: # Input and validation of continue check (Whether user remembers password)
                                 try:
                                     rememberCheck = str(input('Do you remember the old password? (Y/N) ')).upper()
                                     if rememberCheck == 'Y' or rememberCheck == 'N':
@@ -98,21 +104,23 @@ def passwordStorage():
                                 except TypeError or ValueError:
                                     print("That is invalid, please enter 'Y' or 'N'")
                                     continue
-                            if rememberCheck == 'Y':
+                            
+                            if rememberCheck == 'Y': # User remembers old password, initiate reset
                                 while True:
-                                    masterpasswordcheck = str(getpass('Enter your old password: (You will not be able to view it while typing '))
+                                    masterpasswordcheck = str(getpass('Enter your old password: (You will not be able to view it while typing) '))
                                     if masterpasswordcheck != firstline:
                                         print('That is wrong, try again')
                                         continue
                                     else:
                                         break
-                                with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'r+') as MPCheck:
+                                with open('masterpasswordcheck.txt', 'r+') as MPCheck:
                                     MPCheck.truncate(0)
-                                with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'w') as MPCheck:
+                                with open('masterpasswordcheck.txt', 'w') as MPCheck:
                                     firstline = createMP()
                                     MPCheck.write(firstline)
                                 security = securityQuestion()
-                            else:
+                            
+                            else: # User forgot password, ask security question, initiate reset
                                 with open('securityquestion.txt', 'r') as SecurityFile:
                                     securitylines = []
                                     for line in SecurityFile:
@@ -125,9 +133,9 @@ def passwordStorage():
                                         continue
                                     else:
                                         break
-                                with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'r+') as MPCheck:
+                                with open('masterpasswordcheck.txt', 'r+') as MPCheck:
                                     MPCheck.truncate(0)
-                                with open('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/masterpasswordcheck.txt', 'w') as MPCheck:
+                                with open('masterpasswordcheck.txt', 'w') as MPCheck:
                                     firstline = createMP()
                                     MPCheck.write(firstline)
                                 with open('securityquestion.txt', 'r+') as securityFile:
@@ -135,25 +143,26 @@ def passwordStorage():
                                     security = securityQuestion()
                                     securityFile.write(security[0] + '\n')
                                     securityFile.write(security[1])
-                                
-                        elif masterpasswordcheck != firstline:
+                    
+                        elif masterpasswordcheck != firstline: # User doesn't reset, but enters wrong password
                             print('That is invalid, please try again.')
                             continue
-                        else:
+                        else: # User enters correct password, break out of the loop and allow access to file
                             validatingAuthenticity = True
                             break
+        
         if validatingAuthenticity == True: # Allows user to access passwords generated from passwordGeneration.py
             import os
-            fileExist = os.path.exists('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt') # Checks if user has generated at least one password 
-            entryExist = os.stat('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt').st_size
+            fileExist = os.path.exists('file-passwords.txt') # Checks if user has generated at least one password 
+            entryExist = os.stat('file-passwords.txt').st_size
             if fileExist == True and entryExist > 0: # Shows the user the passwords and terminates     
                
-                with open ('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt', 'r') as myfile: #Extracting number of lines
+                with open ('file-passwords.txt', 'r') as myfile: #Extracting number of lines
                     mylines = []
                     noOfLines = len((myfile).readlines())
                 myfile.close()
                 
-                with open ('/Users/alihosam/Ali/Coding/Python Programs/passwordManager/file-passwords.txt', 'r') as myfile: #Printing two consectuive lines in order to show a complete entry
+                with open ('file-passwords.txt', 'r') as myfile: #Printing two consectuive lines in order to show a complete entry
                     for line in myfile:
                         mylines.append(line.strip())
                     for i in range(0,noOfLines, 2):

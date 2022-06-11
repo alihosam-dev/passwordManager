@@ -1,6 +1,7 @@
-import random, time, pyperclip, string
-
 def PasswordGenerator():
+
+    import random, time, pyperclip, string
+    
     print ('\nWelcome to the Password generator')
 
     while True: # Input and validation of action

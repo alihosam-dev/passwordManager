@@ -1,4 +1,3 @@
-
 import os
 def clear_console(): # Clearing function to clean up terminal
     os.system('clear')
